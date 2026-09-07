@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Checkpoint, UserLocation, CheckpointCategory } from '@/lib/types';
@@ -14,6 +14,8 @@ interface LeafletMapProps {
   onVoteCheckpoint: (id: string, type: 'up' | 'down') => void;
 }
 
+type MapThemeMode = 'dark-radar' | 'midnight-tactical' | 'osm-classic';
+
 export default function LeafletMap({
   checkpoints,
   userLocation,
@@ -23,9 +25,12 @@ export default function LeafletMap({
 }: LeafletMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersRef = useRef<{ [id: string]: L.Marker }>({});
   const userMarkerRef = useRef<L.Marker | null>(null);
   const userCircleRef = useRef<L.Circle | null>(null);
+
+  const [mapTheme, setMapTheme] = useState<MapThemeMode>('dark-radar');
 
   // Initialize Map
   useEffect(() => {
@@ -37,14 +42,6 @@ export default function LeafletMap({
       zoomControl: false,
     });
 
-    // Use 100% Free OpenStreetMap (No API key, No watermark, Full Thai street details)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-      className: 'map-tiles-dark',
-    }).addTo(map);
-
     // Zoom control at bottom-right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -55,6 +52,31 @@ export default function LeafletMap({
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Handle Dynamic Map Theme (Dark Radar, Midnight, or Longdo / OSM Classic)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (tileLayerRef.current) {
+      tileLayerRef.current.remove();
+    }
+
+    const classNameMap: Record<MapThemeMode, string> = {
+      'dark-radar': 'map-tiles-radar',
+      'midnight-tactical': 'map-tiles-midnight',
+      'osm-classic': 'map-tiles-classic',
+    };
+
+    const newLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (Longdo Map data base)',
+      maxZoom: 19,
+      className: classNameMap[mapTheme],
+    }).addTo(map);
+
+    tileLayerRef.current = newLayer;
+  }, [mapTheme]);
 
   // Update user location marker & radar circle
   useEffect(() => {
@@ -84,7 +106,7 @@ export default function LeafletMap({
       })
         .addTo(map)
         .bindPopup(
-          '<div style="color: #0f172a; font-weight: bold; font-size: 12px;">📍 ตำแหน่งปัจจุบันของคุณ</div>'
+          '<div style="color: #ffffff; font-weight: bold; font-size: 12px; font-family: sans-serif;">📍 ตำแหน่งปัจจุบันของคุณ</div>'
         );
     }
 
@@ -92,7 +114,7 @@ export default function LeafletMap({
       userCircleRef.current.setLatLng([userLocation.lat, userLocation.lng]);
     } else {
       userCircleRef.current = L.circle([userLocation.lat, userLocation.lng], {
-        radius: 3500, // 3.5 km radar radius
+        radius: 3500,
         color: '#0284c7',
         fillColor: '#38bdf8',
         fillOpacity: 0.08,
@@ -107,7 +129,6 @@ export default function LeafletMap({
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // Clean up old markers
     Object.values(markersRef.current).forEach((m) => m.remove());
     markersRef.current = {};
 
@@ -157,7 +178,6 @@ export default function LeafletMap({
 
       const marker = L.marker([cp.lat, cp.lng], { icon }).addTo(map);
 
-      // Popup Content in Dark Sleek Style
       const timeAgo = formatTimeAgo(cp.reportedTimestamp);
       const catConfig = CATEGORY_CONFIG[cp.category];
 
@@ -204,7 +224,6 @@ export default function LeafletMap({
 
       marker.bindPopup(popupHtml, { maxWidth: 270 });
 
-      // Handle popup open
       marker.on('popupopen', () => {
         onSelectCheckpoint(cp.id);
         const upBtn = document.getElementById(`vote-up-${cp.id}`);
@@ -234,7 +253,6 @@ export default function LeafletMap({
     });
   }, [checkpoints]);
 
-  // Center map on selected checkpoint
   useEffect(() => {
     if (!selectedCheckpointId || !markersRef.current[selectedCheckpointId]) return;
     const marker = markersRef.current[selectedCheckpointId];
@@ -249,8 +267,8 @@ export default function LeafletMap({
     <div className="relative h-full w-full">
       <div ref={mapContainerRef} className="h-full w-full rounded-2xl z-10" />
 
-      {/* Map Legend Overlay */}
-      <div className="absolute top-3 left-3 z-20 hidden sm:flex items-center gap-2 rounded-xl bg-[#0d111a]/90 p-2 text-[11px] font-bold text-slate-200 shadow-xl backdrop-blur-md border border-slate-800">
+      {/* Map Legend (Bottom Left on Mobile, Top Left on Desktop) */}
+      <div className="absolute top-3 left-3 z-20 hidden md:flex items-center gap-2 rounded-xl bg-black/80 p-2 text-[11px] font-bold text-slate-200 shadow-2xl backdrop-blur-xl border border-white/10">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
           <span className="text-red-400">ด่านสดใหม่</span>
@@ -265,6 +283,43 @@ export default function LeafletMap({
           <span className="h-2 w-2 rounded-full bg-slate-500" />
           <span className="text-slate-400">ยกแล้ว</span>
         </span>
+      </div>
+
+      {/* Map Theme Switcher HUD (Top Right) */}
+      <div className="absolute top-3 right-3 z-20 flex items-center gap-1 rounded-xl border border-white/15 bg-black/80 p-1 backdrop-blur-xl shadow-2xl">
+        <button
+          onClick={() => setMapTheme('dark-radar')}
+          className={`px-2.5 py-1 text-[10px] font-black rounded-lg transition-all ${
+            mapTheme === 'dark-radar'
+              ? 'bg-red-600 text-white shadow-md shadow-red-600/40'
+              : 'text-slate-400 hover:text-white'
+          }`}
+          title="โหมดเรดาร์กลางคืน (Dark Radar)"
+        >
+          🌙 มืดเรดาร์
+        </button>
+        <button
+          onClick={() => setMapTheme('midnight-tactical')}
+          className={`px-2.5 py-1 text-[10px] font-black rounded-lg transition-all ${
+            mapTheme === 'midnight-tactical'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/40'
+              : 'text-slate-400 hover:text-white'
+          }`}
+          title="โหมดมิดไนท์บลู (Midnight Navy)"
+        >
+          🌌 มิดไนท์
+        </button>
+        <button
+          onClick={() => setMapTheme('osm-classic')}
+          className={`px-2.5 py-1 text-[10px] font-black rounded-lg transition-all ${
+            mapTheme === 'osm-classic'
+              ? 'bg-amber-500 text-black shadow-md shadow-amber-500/40 font-black'
+              : 'text-slate-400 hover:text-white'
+          }`}
+          title="โหมดสีธรรมชาติแบบต้นฉบับ Longdo / OSM"
+        >
+          🗺️ แบบ Longdo
+        </button>
       </div>
     </div>
   );

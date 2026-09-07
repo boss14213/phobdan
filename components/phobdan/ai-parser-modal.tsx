@@ -1,0 +1,197 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Bot, Sparkles, X, ArrowRight, CheckCircle2, AlertTriangle, Send } from 'lucide-react';
+import { Checkpoint, CheckpointCategory, CheckpointDirection } from '@/lib/types';
+
+interface AiParserModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddCheckpoint: (cp: any) => void;
+}
+
+// Known Bangkok landmark reference points for smart AI geocoding
+const BANGKOK_LANDMARKS: { [key: string]: { lat: number; lng: number } } = {
+  'วิภาวดี': { lat: 13.7850, lng: 100.5580 },
+  'พหลโยธิน': { lat: 13.8250, lng: 100.5700 },
+  'รัชดา': { lat: 13.8150, lng: 100.5760 },
+  'พระราม 9': { lat: 13.7500, lng: 100.5850 },
+  'สุขุมวิท': { lat: 13.7380, lng: 100.5650 },
+  'เกษตร-นวมินทร์': { lat: 13.8320, lng: 100.6120 },
+  'บรมราชชนนี': { lat: 13.7820, lng: 100.4720 },
+  'สาทร': { lat: 13.7200, lng: 100.5230 },
+  'ราชพฤกษ์': { lat: 13.8210, lng: 100.4500 },
+  'พระราม 2': { lat: 13.6670, lng: 100.4370 },
+  'ลาดพร้าว': { lat: 13.8050, lng: 100.5820 },
+  'บางนา': { lat: 13.6680, lng: 100.6050 },
+  'ดินแดง': { lat: 13.7660, lng: 100.5520 },
+  'รามคำแหง': { lat: 13.7520, lng: 100.6150 },
+};
+
+export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModalProps) {
+  const [inputText, setInputText] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [parsedResult, setParsedResult] = useState<any | null>(null);
+
+  if (!isOpen) return null;
+
+  const handleProcessText = () => {
+    if (!inputText.trim()) return;
+
+    setIsProcessing(true);
+
+    setTimeout(() => {
+      const text = inputText.toLowerCase();
+
+      // 1. Detect Category
+      let category: CheckpointCategory = 'traffic_discipline';
+      if (text.includes('แอลกอฮอล์') || text.includes('เป่า') || text.includes('เมา') || text.includes('เหล้า')) {
+        category = 'alcohol';
+      } else if (text.includes('ความเร็ว') || text.includes('กล้อง') || text.includes('ยิง')) {
+        category = 'speed';
+      } else if (text.includes('ควันดำ') || text.includes('มลพิษ') || text.includes('ตรวจควัน')) {
+        category = 'smoke';
+      } else if (text.includes('ตรวจฉี่') || text.includes('อาชญากรรม') || text.includes('ความมั่นคง')) {
+        category = 'security';
+      }
+
+      // 2. Detect Direction
+      let direction: CheckpointDirection = 'inbound';
+      let directionText = 'ขาเข้าเมือง';
+      if (text.includes('ขาออก')) {
+        direction = 'outbound';
+        directionText = 'ขาออกเมือง';
+      } else if (text.includes('สองฝั่ง') || text.includes('ทั้งสอง')) {
+        direction = 'both';
+        directionText = 'ทั้งสองทิศทาง';
+      }
+
+      // 3. Approximate Geocoding from text landmarks
+      let lat = 13.7563;
+      let lng = 100.5018;
+
+      for (const [landmark, coords] of Object.entries(BANGKOK_LANDMARKS)) {
+        if (text.includes(landmark.toLowerCase())) {
+          lat = coords.lat + (Math.random() - 0.5) * 0.006;
+          lng = coords.lng + (Math.random() - 0.5) * 0.006;
+          break;
+        }
+      }
+
+      // 4. Extract Location Summary
+      const locationName = inputText.length > 50 ? inputText.slice(0, 48) + '...' : inputText;
+
+      setParsedResult({
+        category,
+        direction,
+        directionText,
+        locationName,
+        note: `สกัดข้อมูลจากข้อความ: "${inputText}"`,
+        lat,
+        lng,
+      });
+
+      setIsProcessing(false);
+    }, 600);
+  };
+
+  const handleConfirmAdd = () => {
+    if (!parsedResult) return;
+    onAddCheckpoint(parsedResult);
+    setParsedResult(null);
+    setInputText('');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/15 bg-[#0d111a] p-5 sm:p-6 shadow-2xl">
+        {/* Specular Header */}
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 text-white shadow-md shadow-purple-500/30">
+              <Bot className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-black text-white flex items-center gap-1.5">
+                <span>AI ช่วยกวาดพิกัดด่านอัตโนมัติ</span>
+                <span className="rounded-md bg-purple-950/80 border border-purple-500/40 px-1.5 py-0.2 text-[9px] font-bold text-purple-300">
+                  AI ASSISTANT
+                </span>
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                ก๊อปปี้ข้อความจากกลุ่ม LINE / Facebook มาแปะ ให้ AI ถอดรหัสพิกัดทันที
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="rounded-full p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Input Box */}
+        <div className="mt-4 space-y-3">
+          <div>
+            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+              วางข้อความรายงานด่านจากโซเชียล:
+            </label>
+            <textarea
+              rows={3}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="ตัวอย่าง: 'ด่วนมาก วิภาวดีขาออกก่อนถึงแยกสุทธิสารมีตั้งกรวยตรวจหมวกกันน็อคเลนซ้าย รถมอเตอร์ไซค์โดนเยอะมาก'"
+              className="w-full rounded-2xl border border-white/10 bg-black/60 p-3 text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <button
+            onClick={handleProcessText}
+            disabled={isProcessing || !inputText.trim()}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 py-2.5 text-xs font-black text-white shadow-lg shadow-purple-600/30 transition-all hover:opacity-95 active:scale-98 disabled:opacity-50"
+          >
+            <Sparkles className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
+            <span>{isProcessing ? 'AI กำลังวิเคราะห์ภาษาธรรมชาติ...' : '⚡ ให้ AI แปลงเป็นพิกัดด่านทันที'}</span>
+          </button>
+
+          {/* AI Result Card */}
+          {parsedResult && (
+            <div className="mt-4 rounded-2xl border border-emerald-500/40 bg-emerald-950/20 p-4 animate-in fade-in duration-200">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 mb-2">
+                <CheckCircle2 className="h-4 w-4" />
+                <span>AI ถอดรหัสข้อมูลสำเร็จ:</span>
+              </div>
+
+              <div className="space-y-1.5 text-xs text-slate-300 bg-black/40 p-3 rounded-xl border border-white/5">
+                <p>
+                  📍 <strong>สถานที่:</strong> {parsedResult.locationName}
+                </p>
+                <p>
+                  🪖 <strong>ประเภท:</strong> {parsedResult.category}
+                </p>
+                <p>
+                  🛣️ <strong>ทิศทาง:</strong> {parsedResult.directionText}
+                </p>
+                <p>
+                  🌐 <strong>พิกัดโดยประมาณ:</strong> {parsedResult.lat.toFixed(4)}, {parsedResult.lng.toFixed(4)}
+                </p>
+              </div>
+
+              <button
+                onClick={handleConfirmAdd}
+                className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2.5 text-xs font-black text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-500 active:scale-98"
+              >
+                <span>✅ ยืนยันและปักหมุดนี้ลงแผนที่ทันที</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

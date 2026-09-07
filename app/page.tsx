@@ -10,13 +10,21 @@ import { CheckinModal } from '@/components/phobdan/checkin-modal';
 import { SafetyChecklist } from '@/components/phobdan/safety-checklist';
 import { LocationPermissionModal } from '@/components/phobdan/location-permission-modal';
 import { NightPatrolModal } from '@/components/phobdan/night-patrol-modal';
+import { AiParserModal } from '@/components/phobdan/ai-parser-modal';
 import {
   INITIAL_CHECKPOINTS,
   DEFAULT_USER_LOCATION,
   calculateDistanceKm,
 } from '@/lib/mock-checkpoints';
+import {
+  fetchLiveCheckpoints,
+  insertLiveCheckpoint,
+  voteLiveCheckpoint,
+  supabase,
+  isSupabaseConfigured,
+} from '@/lib/supabase';
 import { Checkpoint, CheckpointCategory, UserLocation } from '@/lib/types';
-import { Sparkles, MapPin, ListFilter, PlusCircle, RefreshCw, Radar } from 'lucide-react';
+import { Sparkles, MapPin, ListFilter, PlusCircle, RefreshCw, Radar, Bot } from 'lucide-react';
 
 export default function PhobDanPage() {
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(INITIAL_CHECKPOINTS);
@@ -28,6 +36,8 @@ export default function PhobDanPage() {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [isCheckinOpen, setIsCheckinOpen] = useState(false);
   const [is3DModalOpen, setIs3DModalOpen] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [isLiveDbConnected, setIsLiveDbConnected] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -56,6 +66,77 @@ export default function PhobDanPage() {
         });
     } else {
       setShowLocationModal(true);
+    }
+  }, []);
+
+  // Connect to Supabase Live Database & Subscribe to Realtime Updates
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    // 1. Initial fetch of live checkpoints from cloud
+    fetchLiveCheckpoints().then((liveData) => {
+      if (liveData && liveData.length > 0) {
+        setCheckpoints(liveData);
+        setIsLiveDbConnected(true);
+      }
+    });
+
+    // 2. Realtime listener for new check-ins and vote changes
+    if (supabase) {
+      const channel = supabase
+        .channel('phobdan_realtime_checkpoints')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'checkpoints' },
+          (payload) => {
+            if (payload.eventType === 'INSERT') {
+              const item: any = payload.new;
+              const newCp: Checkpoint = {
+                id: item.id,
+                title: item.title,
+                locationName: item.location_name,
+                lat: Number(item.lat),
+                lng: Number(item.lng),
+                category: item.category,
+                direction: item.direction,
+                directionText: item.direction_text,
+                note: item.note,
+                reportedTimestamp: Number(item.reported_timestamp),
+                reportedBy: item.reported_by || 'สมาชิกชุมชน',
+                upvotes: Number(item.upvotes || 0),
+                downvotes: Number(item.downvotes || 0),
+                status: item.status || 'active',
+              };
+              setCheckpoints((prev) => {
+                if (prev.some((c) => c.id === newCp.id)) return prev;
+                return [newCp, ...prev];
+              });
+              showToast(`🚨 มีการปักหมุดด่านใหม่: ${newCp.title}`);
+            } else if (payload.eventType === 'UPDATE') {
+              const item: any = payload.new;
+              setCheckpoints((prev) =>
+                prev.map((c) =>
+                  c.id === item.id
+                    ? {
+                        ...c,
+                        upvotes: Number(item.upvotes || 0),
+                        downvotes: Number(item.downvotes || 0),
+                        status: item.status || c.status,
+                        reportedTimestamp: Number(
+                          item.reported_timestamp || c.reportedTimestamp
+                        ),
+                      }
+                    : c
+                )
+              );
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase?.removeChannel(channel);
+      };
     }
   }, []);
 
@@ -175,6 +256,10 @@ export default function PhobDanPage() {
 
   // Handle Google Maps style Verification Vote (Up / Down)
   const handleVote = (id: string, type: 'up' | 'down') => {
+    let updatedUpvotes = 0;
+    let updatedDownvotes = 0;
+    let updatedStatus = 'active';
+
     setCheckpoints((prev) =>
       prev.map((cp) => {
         if (cp.id !== id) return cp;
@@ -191,6 +276,10 @@ export default function PhobDanPage() {
           newStatus = 'cleared';
         }
 
+        updatedUpvotes = newUpvotes;
+        updatedDownvotes = newDownvotes;
+        updatedStatus = newStatus;
+
         return {
           ...cp,
           upvotes: newUpvotes,
@@ -201,6 +290,17 @@ export default function PhobDanPage() {
         };
       })
     );
+
+    // Save to Supabase Cloud Database if configured
+    if (isSupabaseConfigured) {
+      voteLiveCheckpoint(
+        id,
+        updatedUpvotes,
+        updatedDownvotes,
+        updatedStatus,
+        type === 'up' ? Date.now() : undefined
+      );
+    }
 
     if (type === 'up') {
       setUserScore((s) => s + 5);
@@ -244,6 +344,25 @@ export default function PhobDanPage() {
     setUserScore((s) => s + 15);
     setViewMode('map');
     showToast('🚨 ปักหมุดสำเร็จ! ข้อมูลของคุณกำลังช่วยเพื่อนร่วมทาง (+15 แต้ม)');
+
+    // Save to Supabase Cloud Database if configured
+    if (isSupabaseConfigured) {
+      insertLiveCheckpoint(newCp);
+    }
+  };
+
+  // Handle AI Parsed Checkpoint Submission
+  const handleAiAddCheckpoint = (data: {
+    category: CheckpointCategory;
+    direction: any;
+    directionText: string;
+    locationName: string;
+    note: string;
+    lat: number;
+    lng: number;
+  }) => {
+    handleNewCheckin(data);
+    showToast('🤖 AI ถอดรหัสพิกัดและบันทึกด่านสำเร็จ! ขอบคุณที่ร่วมเตือนภัย');
   };
 
   const activeCount = checkpoints.filter((c) => c.status !== 'cleared').length;
@@ -269,6 +388,7 @@ export default function PhobDanPage() {
         onToggleLiveTracking={toggleLiveTracking}
         onOpenLocationModal={() => setShowLocationModal(true)}
         onOpen3DMode={() => setIs3DModalOpen(true)}
+        onOpenAiModal={() => setIsAiModalOpen(true)}
       />
 
       {/* Floating Toast Message */}
@@ -285,6 +405,7 @@ export default function PhobDanPage() {
         <HeroBanner
           onOpenCheckin={() => setIsCheckinOpen(true)}
           onOpen3DMode={() => setIs3DModalOpen(true)}
+          onOpenAiModal={() => setIsAiModalOpen(true)}
           activeCount={activeCount}
           totalConfirmedCount={totalConfirmed}
           selectedCategory={selectedCategory}
@@ -493,6 +614,13 @@ export default function PhobDanPage() {
       <NightPatrolModal
         isOpen={is3DModalOpen}
         onClose={() => setIs3DModalOpen(false)}
+      />
+
+      {/* AI Checkpoint Text Parser & Ingestion Modal */}
+      <AiParserModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        onAddCheckpoint={handleAiAddCheckpoint}
       />
     </div>
   );

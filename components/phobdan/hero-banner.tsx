@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { PlusCircle, Sparkles, Navigation, Layers } from 'lucide-react';
+import { PlusCircle, Sparkles, Navigation, Layers, Bot } from 'lucide-react';
 import { CheckpointCategory } from '@/lib/types';
 
 interface HeroBannerProps {
   onOpenCheckin: () => void;
   onOpen3DMode: () => void;
+  onOpenAiModal?: () => void;
   activeCount: number;
   totalConfirmedCount: number;
   selectedCategory: CheckpointCategory | 'all';
@@ -16,6 +17,7 @@ interface HeroBannerProps {
 export function HeroBanner({
   onOpenCheckin,
   onOpen3DMode,
+  onOpenAiModal,
   activeCount,
   totalConfirmedCount,
   selectedCategory,
@@ -57,10 +59,21 @@ export function HeroBanner({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+            {onOpenAiModal && (
+              <button
+                onClick={onOpenAiModal}
+                className="flex items-center gap-1.5 rounded-2xl border border-purple-500/40 bg-purple-950/50 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold text-purple-200 backdrop-blur-2xl shadow-xl transition-all hover:bg-purple-900/50 hover:border-purple-400 active:scale-95"
+                title="นำเข้าข้อความรายงานด่านจากโซเชียลด้วย AI"
+              >
+                <Bot className="h-4 w-4 text-purple-400 animate-pulse" />
+                <span>AI กวาดด่าน</span>
+              </button>
+            )}
+
             <button
               onClick={onOpen3DMode}
-              className="flex items-center gap-2 rounded-2xl border border-white/20 bg-black/50 px-4 py-3 text-xs sm:text-sm font-extrabold text-white backdrop-blur-2xl shadow-xl transition-all hover:bg-white/10 hover:border-white/40 active:scale-95"
+              className="flex items-center gap-2 rounded-2xl border border-white/20 bg-black/50 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold text-white backdrop-blur-2xl shadow-xl transition-all hover:bg-white/10 hover:border-white/40 active:scale-95"
             >
               <Sparkles className="h-4 w-4 text-blue-400" />
               <span>โหมด 3D</span>

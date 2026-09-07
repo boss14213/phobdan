@@ -10,6 +10,7 @@ import {
   HelpCircle,
   MessageSquare,
   ShieldAlert,
+  Share2,
 } from 'lucide-react';
 import { Checkpoint } from '@/lib/types';
 import { formatTimeAgo, CATEGORY_CONFIG } from '@/lib/mock-checkpoints';
@@ -131,19 +132,49 @@ export function NearbyFeed({
               </div>
             )}
 
-            {/* Google Maps Style Verification Block */}
+            {/* Google Maps Style Verification Block & 1-Click LINE Share */}
             <div
               className="mt-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-t border-slate-800/80 pt-3"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <HelpCircle className="h-3.5 w-3.5 text-blue-400" />
-                <span className="font-semibold text-slate-300">
-                  ตรงนี้ยังมีด่านอยู่ไหม?
-                </span>
+              <div className="flex items-center justify-between w-full sm:w-auto">
+                <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <HelpCircle className="h-3.5 w-3.5 text-blue-400" />
+                  <span className="font-semibold text-slate-300">
+                    ตรงนี้ยังมีด่านอยู่ไหม?
+                  </span>
+                </div>
+
+                {/* Mobile-only LINE share icon */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const shareText = `🚨 เตือนภัยจุดตรวจ: ${cp.title}\n📍 ${cp.directionText}\n💡 ${cp.note || catConfig.label}\nขับขี่ปลอดภัย สวมหมวก เมาไม่ขับ\n🔗 เช็คเรดาร์สดที่: ${typeof window !== 'undefined' ? window.location.href : 'https://phobdan.vercel.app'}`;
+                    window.open(`https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`, '_blank');
+                  }}
+                  className="sm:hidden flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-1 text-[10px] font-bold text-emerald-300 active:scale-95"
+                  title="แชร์เข้า LINE"
+                >
+                  <Share2 className="h-3 w-3 text-emerald-400" />
+                  <span>แชร์ LINE</span>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Desktop LINE share button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const shareText = `🚨 เตือนภัยจุดตรวจ: ${cp.title}\n📍 ${cp.directionText}\n💡 ${cp.note || catConfig.label}\nขับขี่ปลอดภัย สวมหมวก เมาไม่ขับ\n🔗 เช็คเรดาร์สดที่: ${typeof window !== 'undefined' ? window.location.href : 'https://phobdan.vercel.app'}`;
+                    window.open(`https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`, '_blank');
+                  }}
+                  className="hidden sm:flex items-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-900/50 active:scale-95 transition-all"
+                  title="แชร์เข้า LINE"
+                >
+                  <Share2 className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>แชร์ LINE</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => onVoteCheckpoint(cp.id, 'up')}

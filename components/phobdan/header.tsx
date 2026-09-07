@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MapPin, ListFilter, Navigation, Award, Radio, Sparkles } from 'lucide-react';
+import { MapPin, ListFilter, Navigation, Award, Radio, Sparkles, Bot } from 'lucide-react';
 
 interface HeaderProps {
   viewMode: 'map' | 'list';
@@ -15,6 +15,7 @@ interface HeaderProps {
   onToggleLiveTracking: () => void;
   onOpenLocationModal: () => void;
   onOpen3DMode: () => void;
+  onOpenAiModal?: () => void;
 }
 
 export function Header({
@@ -29,6 +30,7 @@ export function Header({
   onToggleLiveTracking,
   onOpenLocationModal,
   onOpen3DMode,
+  onOpenAiModal,
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#07090e]/85 backdrop-blur-2xl transition-all shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
@@ -75,6 +77,18 @@ export function Header({
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
+          {/* AI Parser Button */}
+          {onOpenAiModal && (
+            <button
+              onClick={onOpenAiModal}
+              className="flex items-center gap-1.5 rounded-xl border border-purple-500/30 bg-purple-950/40 px-2.5 sm:px-3 py-1.5 text-xs font-extrabold text-purple-200 shadow-md shadow-purple-950/50 backdrop-blur-xl transition-all hover:scale-105 hover:border-purple-400 active:scale-95"
+              title="AI ช่วยกวาดพิกัดด่านจากข้อความโซเชียล"
+            >
+              <Bot className="h-3.5 w-3.5 text-purple-400" />
+              <span className="hidden sm:inline">AI กวาดพิกัด</span>
+            </button>
+          )}
+
           {/* 3D Mode Button */}
           <button
             onClick={onOpen3DMode}

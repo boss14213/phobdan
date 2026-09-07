@@ -9,13 +9,14 @@ import { NearbyFeed } from '@/components/phobdan/nearby-feed';
 import { CheckinModal } from '@/components/phobdan/checkin-modal';
 import { SafetyChecklist } from '@/components/phobdan/safety-checklist';
 import { LocationPermissionModal } from '@/components/phobdan/location-permission-modal';
+import { NightPatrolModal } from '@/components/phobdan/night-patrol-modal';
 import {
   INITIAL_CHECKPOINTS,
   DEFAULT_USER_LOCATION,
   calculateDistanceKm,
 } from '@/lib/mock-checkpoints';
 import { Checkpoint, CheckpointCategory, UserLocation } from '@/lib/types';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, MapPin, ListFilter, PlusCircle, RefreshCw, Radar } from 'lucide-react';
 
 export default function PhobDanPage() {
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(INITIAL_CHECKPOINTS);
@@ -26,6 +27,7 @@ export default function PhobDanPage() {
   const [selectedCategory, setSelectedCategory] = useState<CheckpointCategory | 'all'>('all');
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [isCheckinOpen, setIsCheckinOpen] = useState(false);
+  const [is3DModalOpen, setIs3DModalOpen] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -44,15 +46,12 @@ export default function PhobDanPage() {
         .query({ name: 'geolocation' as PermissionName })
         .then((result) => {
           if (result.state === 'granted') {
-            // Already granted, silently get location
             fetchCurrentGps(false);
           } else if (result.state === 'prompt') {
-            // Ask user with custom friendly HUD modal
             setShowLocationModal(true);
           }
         })
         .catch(() => {
-          // Fallback
           setShowLocationModal(true);
         });
     } else {
@@ -107,7 +106,7 @@ export default function PhobDanPage() {
     );
   };
 
-  // Toggle Continuous Live Tracking (ขณะขับขี่)
+  // Toggle Continuous Live Tracking
   const toggleLiveTracking = () => {
     if (isLiveTracking) {
       if (watchIdRef.current !== null) {
@@ -251,7 +250,12 @@ export default function PhobDanPage() {
   const totalConfirmed = checkpoints.reduce((acc, c) => acc + c.upvotes, 0);
 
   return (
-    <div className="min-h-screen bg-[#090b10] text-slate-100 flex flex-col selection:bg-red-600 selection:text-white">
+    <div className="relative min-h-screen bg-[#07090e] text-slate-100 flex flex-col selection:bg-red-600 selection:text-white overflow-x-hidden">
+      {/* Ambient Police Siren Light Orbs Sweeping in Night Background */}
+      <div className="pointer-events-none fixed -top-40 -left-40 h-96 w-96 rounded-full bg-red-600/15 blur-[120px] animate-siren-red z-0" />
+      <div className="pointer-events-none fixed -top-40 -right-40 h-96 w-96 rounded-full bg-blue-600/20 blur-[130px] animate-siren-blue z-0" />
+      <div className="pointer-events-none fixed top-1/2 left-1/3 h-80 w-80 rounded-full bg-sky-600/10 blur-[140px] z-0" />
+
       {/* Navigation Bar */}
       <Header
         viewMode={viewMode}
@@ -264,28 +268,30 @@ export default function PhobDanPage() {
         isLiveTracking={isLiveTracking}
         onToggleLiveTracking={toggleLiveTracking}
         onOpenLocationModal={() => setShowLocationModal(true)}
+        onOpen3DMode={() => setIs3DModalOpen(true)}
       />
 
       {/* Floating Toast Message */}
       {toastMessage && (
-        <div className="fixed top-16 left-1/2 z-50 -translate-x-1/2 transform rounded-full bg-slate-900 border border-blue-500/50 px-4 py-2.5 text-xs font-bold text-white shadow-2xl shadow-blue-500/20 animate-in slide-in-from-top duration-200 flex items-center gap-2">
+        <div className="fixed top-16 left-1/2 z-50 -translate-x-1/2 transform rounded-full border border-white/20 bg-black/80 px-4 py-2.5 text-xs font-black text-white shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-2xl animate-in slide-in-from-top duration-200 flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-blue-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Main Content Area */}
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-4 sm:py-6 space-y-5">
-        {/* Hero Banner with Artwork */}
+      <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-4 py-4 sm:py-6 space-y-5 pb-24 sm:pb-8">
+        {/* Hero Banner with Artwork & 3D trigger */}
         <HeroBanner
           onOpenCheckin={() => setIsCheckinOpen(true)}
+          onOpen3DMode={() => setIs3DModalOpen(true)}
           activeCount={activeCount}
           totalConfirmedCount={totalConfirmed}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
         />
 
-        {/* Real-Time Radar Scanner */}
+        {/* Real-Time Radar Scanner (Auto-Scan on entry) */}
         <RadarScanner
           checkpoints={checkpointsWithDistance}
           userLocation={userLocation}
@@ -304,9 +310,9 @@ export default function PhobDanPage() {
         {/* Main Map & Nearby Section */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+            <h3 className="text-base font-black text-white flex items-center gap-2">
               <span>เรดาร์และพิกัดด่านรอบตัว</span>
-              <span className="rounded-full bg-slate-800 border border-slate-700 px-2 py-0.5 text-xs font-bold text-slate-300">
+              <span className="rounded-full bg-white/[0.06] border border-white/10 px-2.5 py-0.5 text-xs font-black text-blue-300 shadow-sm">
                 {filteredCheckpoints.length} จุด
               </span>
             </h3>
@@ -357,8 +363,8 @@ export default function PhobDanPage() {
         </div>
 
         {/* Community Loop Section */}
-        <section className="rounded-3xl border border-slate-800 bg-[#0c1017] p-5 sm:p-6 text-center space-y-4">
-          <div className="inline-block rounded-full bg-blue-950/80 border border-blue-500/40 px-3 py-1 text-[11px] font-bold text-blue-400">
+        <section className="rounded-3xl border border-white/[0.12] bg-[#0c101a]/70 p-5 sm:p-6 text-center space-y-4 backdrop-blur-xl shadow-2xl">
+          <div className="inline-block rounded-full bg-blue-950/80 border border-blue-500/40 px-3.5 py-1 text-[11px] font-black text-blue-400 uppercase tracking-wide">
             COMMUNITY LOOP • วงจรขับขี่ปลอดภัย
           </div>
           <h3 className="text-lg sm:text-xl font-black text-white">
@@ -369,7 +375,7 @@ export default function PhobDanPage() {
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-left">
-            <div className="rounded-2xl border border-slate-800/80 bg-[#090b10] p-3">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#080b12]/80 p-3.5 shadow-md">
               <span className="text-lg font-black text-blue-400">01. สแกน</span>
               <h4 className="font-bold text-xs mt-1 text-white">ตรวจพิกัด GPS</h4>
               <p className="text-[11px] text-slate-400 mt-0.5">
@@ -377,7 +383,7 @@ export default function PhobDanPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-800/80 bg-[#090b10] p-3">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#080b12]/80 p-3.5 shadow-md">
               <span className="text-lg font-black text-red-400">02. ปักหมุด</span>
               <h4 className="font-bold text-xs mt-1 text-white">แจ้งเตือนใน 10 วิ</h4>
               <p className="text-[11px] text-slate-400 mt-0.5">
@@ -385,7 +391,7 @@ export default function PhobDanPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-800/80 bg-[#090b10] p-3">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#080b12]/80 p-3.5 shadow-md">
               <span className="text-lg font-black text-blue-400">03. ยืนยันสด</span>
               <h4 className="font-bold text-xs mt-1 text-white">ยังอยู่ หรือ ยกแล้ว</h4>
               <p className="text-[11px] text-slate-400 mt-0.5">
@@ -393,7 +399,7 @@ export default function PhobDanPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-800/80 bg-[#090b10] p-3">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#080b12]/80 p-3.5 shadow-md">
               <span className="text-lg font-black text-emerald-400">04. ปลอดภัย</span>
               <h4 className="font-bold text-xs mt-1 text-white">ชะลอความเร็ว สวมหมวก</h4>
               <p className="text-[11px] text-slate-400 mt-0.5">
@@ -404,8 +410,54 @@ export default function PhobDanPage() {
         </section>
       </main>
 
+      {/* Floating Bottom Mobile Navigation Dock (Mobile-First Thumb Experience) */}
+      <aside aria-label="Mobile Navigation Dock" className="fixed bottom-4 left-4 right-4 z-40 sm:hidden">
+        <div className="flex items-center justify-around rounded-2xl border border-white/15 bg-black/80 p-2 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9)]">
+          <button
+            onClick={() => setIsCheckinOpen(true)}
+            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-red-400 transition-all active:scale-90"
+          >
+            <PlusCircle className="h-5 w-5 text-red-500 animate-pulse" />
+            <span className="text-[10px]">ปักหมุด</span>
+          </button>
+
+          <button
+            onClick={() => fetchCurrentGps(true)}
+            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-blue-400 transition-all active:scale-90"
+          >
+            <Radar className="h-5 w-5 text-blue-500" />
+            <span className="text-[10px]">สแกน</span>
+          </button>
+
+          <button
+            onClick={() => setIs3DModalOpen(true)}
+            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-purple-300 transition-all active:scale-90"
+          >
+            <Sparkles className="h-5 w-5 text-purple-400" />
+            <span className="text-[10px]">โหมด 3D</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-slate-300 transition-all active:scale-90"
+          >
+            {viewMode === 'map' ? (
+              <>
+                <ListFilter className="h-5 w-5 text-slate-400" />
+                <span className="text-[10px]">ดูรายการ</span>
+              </>
+            ) : (
+              <>
+                <MapPin className="h-5 w-5 text-slate-400" />
+                <span className="text-[10px]">ดูแผนที่</span>
+              </>
+            )}
+          </button>
+        </div>
+      </aside>
+
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#07080c] py-6 text-center text-xs text-slate-400">
+      <footer className="border-t border-white/[0.08] bg-[#05070a] py-6 text-center text-xs text-slate-400">
         <div className="mx-auto max-w-5xl px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 font-bold text-white">
             <span>🚨 พบด่าน (PhobDan)</span>
@@ -435,6 +487,12 @@ export default function PhobDanPage() {
         onClose={() => setIsCheckinOpen(false)}
         userLocation={userLocation}
         onSubmitCheckin={handleNewCheckin}
+      />
+
+      {/* 3D Infinite Night Patrol Gallery Modal */}
+      <NightPatrolModal
+        isOpen={is3DModalOpen}
+        onClose={() => setIs3DModalOpen(false)}
       />
     </div>
   );

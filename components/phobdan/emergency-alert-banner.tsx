@@ -77,13 +77,13 @@ export function EmergencyAlertBanner({ alert, onDismiss }: EmergencyAlertBannerP
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap w-full md:w-auto">
           {/* Turn-by-Turn Navigation */}
           <a
             href={navUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 px-3.5 py-2 text-xs font-black text-white shadow-lg shadow-blue-600/40 transition-all hover:scale-105 active:scale-95"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 px-3.5 py-2.5 text-xs font-black text-white shadow-lg shadow-blue-600/40 transition-all hover:scale-105 active:scale-95 min-h-[44px]"
           >
             <Compass className="h-4 w-4" />
             <span>🧭 นำทางไปช่วย (Google Maps)</span>
@@ -93,18 +93,18 @@ export function EmergencyAlertBanner({ alert, onDismiss }: EmergencyAlertBannerP
           <button
             type="button"
             onClick={handleShareLine}
-            className="flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/60 px-3 py-2 text-xs font-bold text-emerald-300 transition-all active:scale-95"
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/60 px-3.5 py-2.5 text-xs font-bold text-emerald-300 transition-all active:scale-95 min-h-[44px]"
             title="แชร์พิกัดเข้า LINE"
           >
-            <Share2 className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">แชร์ LINE</span>
+            <Share2 className="h-4 w-4 text-emerald-400" />
+            <span className="inline">แชร์ LINE</span>
           </button>
 
           {/* Dismiss */}
           <button
             type="button"
             onClick={onDismiss}
-            className="rounded-xl border border-white/10 bg-black/40 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all"
+            className="rounded-xl border border-white/10 bg-black/40 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
             title="ปิดการแจ้งเตือน"
           >
             <X className="h-4 w-4" />

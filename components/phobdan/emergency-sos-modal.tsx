@@ -130,28 +130,31 @@ export function EmergencySosModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
-      <div className="relative w-full max-w-lg rounded-3xl border border-red-500/40 bg-gradient-to-b from-[#140b10] via-[#090b10] to-[#07090e] p-5 sm:p-6 shadow-[0_0_60px_rgba(239,68,68,0.3)] text-white max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg rounded-t-[28px] sm:rounded-3xl border border-red-500/40 bg-gradient-to-b from-[#140b10] via-[#090b10] to-[#07090e] p-5 sm:p-6 shadow-[0_0_60px_rgba(239,68,68,0.3)] text-white max-h-[88dvh] sm:max-h-[92vh] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
+        {/* Mobile Swipe / Sheet Grab Handle */}
+        <div className="w-12 h-1.5 bg-white/25 rounded-full mx-auto mb-3 sm:hidden" />
+
         {/* Top Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
-          <div className="flex items-center gap-2.5">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)]">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)]">
               <span className="text-xl">🚨</span>
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-80" />
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
               </span>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-black tracking-tight text-white uppercase">
+                <h3 className="text-base sm:text-lg font-black tracking-tight text-white uppercase truncate">
                   ขอความช่วยเหลือฉุกเฉิน
                 </h3>
-                <span className="rounded-md bg-red-950 border border-red-500/40 px-1.5 py-0.5 text-[9px] font-black text-red-400 animate-pulse">
+                <span className="rounded-md bg-red-950 border border-red-500/40 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-black text-red-400 animate-pulse shrink-0">
                   SOS ACTIVE
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[10px] sm:text-[11px] text-slate-400 truncate">
                 แจ้งเพื่อนร่วมทางรอบข้าง และแชร์เส้นทางนำทางมาช่วยเหลือ
               </p>
             </div>
@@ -159,7 +162,7 @@ export function EmergencySosModal({
 
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+            className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
           >
             <X className="h-5 w-5" />
           </button>
@@ -279,7 +282,7 @@ export function EmergencySosModal({
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   placeholder="เช่น 081-234-5678"
-                  className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-red-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-black/60 px-3.5 py-2.5 text-sm sm:text-xs text-white placeholder:text-slate-500 focus:border-red-500 focus:outline-none min-h-[44px]"
                 />
               </div>
               <div>
@@ -291,7 +294,7 @@ export function EmergencySosModal({
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="เช่น รถเก๋งสีดำ จอดเปิดไฟฉุกเฉิน"
-                  className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-red-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/10 bg-black/60 px-3.5 py-2.5 text-sm sm:text-xs text-white placeholder:text-slate-500 focus:border-red-500 focus:outline-none min-h-[44px]"
                 />
               </div>
             </div>

@@ -155,32 +155,35 @@ export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModa
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/15 bg-[#0d111a] p-5 sm:p-6 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 p-0 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg rounded-t-[28px] sm:rounded-3xl border border-white/15 bg-[#0d111a] p-5 sm:p-6 shadow-2xl max-h-[88dvh] sm:max-h-[92vh] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
+        {/* Mobile Swipe / Sheet Grab Handle */}
+        <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
+
         {/* Specular Header */}
         <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 text-white shadow-md shadow-purple-500/30">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-blue-600 text-white shadow-md shadow-purple-500/30">
               <Bot className="h-5 w-5" />
             </div>
-            <div>
-              <h3 className="text-base font-black text-white flex items-center gap-1.5">
-                <span>AI ช่วยกวาดพิกัดด่านอัตโนมัติ</span>
-                <span className="rounded-md bg-purple-950/80 border border-purple-500/40 px-1.5 py-0.2 text-[9px] font-bold text-purple-300">
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-1.5 truncate">
+                <span>AI ช่วยกวาดพิกัดด่าน</span>
+                <span className="rounded-md bg-purple-950/80 border border-purple-500/40 px-1.5 py-0.2 text-[8px] sm:text-[9px] font-bold text-purple-300 shrink-0">
                   AI ASSISTANT
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-400">
-                ก๊อปปี้ข้อความจากกลุ่ม LINE / Facebook มาแปะ ให้ AI ถอดรหัสพิกัดทันที
+              <p className="text-[10px] sm:text-[11px] text-slate-400 truncate">
+                ก๊อปปี้ข้อความจาก LINE / Facebook มาแปะ ให้ AI ถอดรหัสพิกัดทันที
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+            className="rounded-full p-2 text-slate-400 hover:bg-slate-800 hover:text-white min-h-[40px] min-w-[40px] flex items-center justify-center"
           >
             <X className="h-5 w-5" />
           </button>
@@ -219,14 +222,14 @@ export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModa
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="ตัวอย่าง: 'ด่วนมาก วิภาวดีขาออกก่อนถึงแยกสุทธิสารมีตั้งกรวยตรวจหมวกกันน็อคเลนซ้าย รถมอเตอร์ไซค์โดนเยอะมาก'"
-              className="w-full rounded-2xl border border-white/10 bg-black/60 p-3 text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-2xl border border-white/10 bg-black/60 p-3 text-sm sm:text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
           <button
             onClick={handleProcessText}
             disabled={isProcessing || !inputText.trim()}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 py-2.5 text-xs font-black text-white shadow-lg shadow-purple-600/30 transition-all hover:opacity-95 active:scale-98 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 py-3 text-xs sm:text-sm font-black text-white shadow-lg shadow-purple-600/30 transition-all hover:opacity-95 active:scale-98 disabled:opacity-50 min-h-[44px]"
           >
             <Sparkles className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
             <span>{isProcessing ? 'AI กำลังวิเคราะห์ภาษาธรรมชาติ...' : '⚡ ให้ AI แปลงเป็นพิกัดด่านทันที'}</span>

@@ -39,48 +39,48 @@ export function Header({
 
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-[#0a0d14] to-red-600 p-[1.5px] shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-[#0a0d14] to-red-600 p-[1.5px] shadow-[0_0_20px_rgba(37,99,235,0.3)]">
             <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-[#07090e]">
-              <span className="text-xl select-none" role="img" aria-label="Siren">
+              <span className="text-lg sm:text-xl select-none" role="img" aria-label="Siren">
                 🚨
               </span>
             </div>
             {/* Pulsing Flashing Beacons */}
-            <span className="absolute -top-1 -left-1 flex h-3 w-3">
+            <span className="absolute -top-1 -left-1 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-80" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
             </span>
-            <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
+            <span className="absolute -bottom-1 -right-1 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-80" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-[0_0_8px_#ef4444]" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-red-500 shadow-[0_0_8px_#ef4444]" />
             </span>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h1 className="text-xl font-black tracking-tight text-white flex items-center drop-shadow-sm">
+              <h1 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center drop-shadow-sm">
                 <span>พบ</span>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-200 to-red-500">
                   ด่าน
                 </span>
               </h1>
-              <span className="rounded-md border border-red-500/30 bg-red-950/70 px-1.5 py-0.5 text-[9px] font-extrabold text-red-400 tracking-wider uppercase shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+              <span className="rounded-md border border-red-500/30 bg-red-950/70 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-extrabold text-red-400 tracking-wider uppercase shadow-[0_0_10px_rgba(239,68,68,0.2)]">
                 NIGHT RADAR
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">
+            <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate max-w-[125px] xs:max-w-[160px] sm:max-w-none">
               ขับขี่ปลอดภัย • สแกนจุดตรวจใกล้คุณ
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Emergency SOS Button */}
           <button
             onClick={onOpenSosModal}
-            className="flex items-center gap-1.5 rounded-xl border border-red-500/60 bg-gradient-to-r from-red-950/80 to-rose-950/80 px-2.5 sm:px-3 py-1.5 text-xs font-black text-red-200 shadow-lg shadow-red-950/60 backdrop-blur-xl transition-all hover:scale-105 hover:border-red-400 hover:text-white active:scale-95 animate-pulse"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-red-500/60 bg-gradient-to-r from-red-950/80 to-rose-950/80 px-2 sm:px-3 py-1.5 text-[11px] sm:text-xs font-black text-red-200 shadow-lg shadow-red-950/60 backdrop-blur-xl transition-all hover:scale-105 hover:border-red-400 hover:text-white active:scale-95 animate-pulse min-h-[36px]"
             title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน"
           >
             <span className="relative flex h-2 w-2">
@@ -95,7 +95,7 @@ export function Header({
           {onOpenAiModal && (
             <button
               onClick={onOpenAiModal}
-              className="flex items-center gap-1.5 rounded-xl border border-purple-500/30 bg-purple-950/40 px-2.5 sm:px-3 py-1.5 text-xs font-extrabold text-purple-200 shadow-md shadow-purple-950/50 backdrop-blur-xl transition-all hover:scale-105 hover:border-purple-400 active:scale-95"
+              className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-purple-500/30 bg-purple-950/40 px-2 sm:px-3 py-1.5 text-[11px] sm:text-xs font-extrabold text-purple-200 shadow-md shadow-purple-950/50 backdrop-blur-xl transition-all hover:scale-105 hover:border-purple-400 active:scale-95 min-h-[36px]"
               title="AI ช่วยกวาดพิกัดด่านจากข้อความโซเชียล"
             >
               <Bot className="h-3.5 w-3.5 text-purple-400" />
@@ -106,7 +106,7 @@ export function Header({
           {/* GPS Status Button */}
           <button
             onClick={hasGps ? onToggleLiveTracking : onOpenLocationModal}
-            className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-extrabold transition-all active:scale-95 ${
+            className={`flex items-center gap-1 sm:gap-1.5 rounded-xl border px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-extrabold transition-all active:scale-95 min-h-[36px] ${
               isLiveTracking
                 ? 'border-emerald-500/60 bg-emerald-950/60 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
                 : hasGps
@@ -124,8 +124,8 @@ export function Header({
             </span>
           </button>
 
-          {/* Toggle Map / List Mode */}
-          <div className="flex items-center rounded-xl border border-white/10 bg-black/60 p-1 backdrop-blur-md">
+          {/* Toggle Map / List Mode (Desktop & Tablet only, Mobile uses Bottom Dock) */}
+          <div className="hidden sm:flex items-center rounded-xl border border-white/10 bg-black/60 p-1 backdrop-blur-md">
             <button
               onClick={() => onViewModeChange('map')}
               className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${

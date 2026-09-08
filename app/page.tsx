@@ -499,7 +499,7 @@ export default function PhobDanPage() {
       )}
 
       {/* Main Content Area */}
-      <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-4 py-4 sm:py-6 space-y-5 pb-24 sm:pb-8">
+      <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-3 sm:px-4 py-4 sm:py-6 space-y-5 pb-28 sm:pb-8">
         {/* Active Emergency SOS Banners (Real-time Broadcast from vicinity) */}
         {activeSosAlerts.map((alert) => (
           <EmergencyAlertBanner
@@ -642,48 +642,51 @@ export default function PhobDanPage() {
       </main>
 
       {/* Floating Bottom Mobile Navigation Dock (Mobile-First Thumb Experience) */}
-      <aside aria-label="Mobile Navigation Dock" className="fixed bottom-4 left-4 right-4 z-40 sm:hidden">
-        <div className="flex items-center justify-around rounded-2xl border border-white/15 bg-black/80 p-2 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9)]">
+      <aside aria-label="Mobile Navigation Dock" className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom,0px))] left-3 right-3 z-40 sm:hidden">
+        <div className="flex items-center justify-between rounded-2xl border border-white/20 bg-[#090d16]/95 p-1.5 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.95)]">
           <button
             onClick={() => setIsCheckinOpen(true)}
-            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-red-400 transition-all active:scale-90"
+            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black text-white hover:bg-white/5 active:scale-95 transition-all min-h-[48px]"
           >
-            <PlusCircle className="h-5 w-5 text-red-500 animate-pulse" />
-            <span className="text-[10px]">ปักหมุด</span>
+            <PlusCircle className="h-5 w-5 text-red-400" />
+            <span className="text-[10px] font-bold text-slate-300">ปักหมุด</span>
           </button>
 
           <button
             onClick={() => fetchCurrentGps(true)}
-            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-blue-400 transition-all active:scale-90"
+            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black text-white hover:bg-white/5 active:scale-95 transition-all min-h-[48px]"
           >
-            <Radar className="h-5 w-5 text-blue-500" />
-            <span className="text-[10px]">สแกน</span>
+            <Radar className="h-5 w-5 text-blue-400" />
+            <span className="text-[10px] font-bold text-slate-300">สแกน</span>
           </button>
 
+          {/* Elevated SOS Beacon */}
           <button
             onClick={() => setIsSosModalOpen(true)}
-            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-rose-400 transition-all active:scale-90 relative"
+            className="flex flex-col items-center justify-center -translate-y-3 rounded-2xl bg-gradient-to-tr from-red-600 via-rose-600 to-red-500 px-3 py-2 text-white shadow-[0_0_24px_rgba(239,68,68,0.7)] border-2 border-white/40 active:scale-95 transition-transform min-w-[62px] min-h-[56px]"
           >
             <span className="relative flex h-5 w-5 items-center justify-center">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
-              <AlertTriangle className="relative h-5 w-5 text-rose-500" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+              <AlertTriangle className="relative h-5 w-5 text-white" />
             </span>
-            <span className="text-[10px] font-black text-rose-300">ขอช่วยเหลือ</span>
+            <span className="text-[10px] font-black text-white tracking-wider mt-0.5">SOS</span>
           </button>
 
           <button
             onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
-            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-slate-300 transition-all active:scale-90"
+            className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black transition-all min-h-[48px] active:scale-95 ${
+              viewMode === 'map' ? 'text-blue-400 bg-blue-500/10' : 'text-emerald-400 bg-emerald-500/10'
+            }`}
           >
             {viewMode === 'map' ? (
               <>
-                <ListFilter className="h-5 w-5 text-slate-400" />
-                <span className="text-[10px]">ดูรายการ</span>
+                <ListFilter className="h-5 w-5 text-blue-400" />
+                <span className="text-[10px] font-bold">ดูรายการ</span>
               </>
             ) : (
               <>
-                <MapPin className="h-5 w-5 text-slate-400" />
-                <span className="text-[10px]">ดูแผนที่</span>
+                <MapPin className="h-5 w-5 text-emerald-400" />
+                <span className="text-[10px] font-bold">ดูแผนที่</span>
               </>
             )}
           </button>

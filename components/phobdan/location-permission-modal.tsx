@@ -21,8 +21,10 @@ export function LocationPermissionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md transition-opacity animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-800 bg-[#0d111a] p-6 shadow-2xl text-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 p-0 sm:p-4 backdrop-blur-md transition-opacity animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md rounded-t-[28px] sm:rounded-3xl border border-slate-800 bg-[#0d111a] p-6 shadow-2xl text-center max-h-[88dvh] sm:max-h-[92vh] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
+        {/* Mobile Swipe / Sheet Grab Handle */}
+        <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
         {/* Glow Effects */}
         <div className="pointer-events-none absolute -top-16 -left-16 h-36 w-36 rounded-full bg-blue-600/20 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-16 -right-16 h-36 w-36 rounded-full bg-red-600/20 blur-2xl" />

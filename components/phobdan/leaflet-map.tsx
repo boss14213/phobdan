@@ -12,6 +12,7 @@ interface LeafletMapProps {
   selectedCheckpointId?: string | null;
   onSelectCheckpoint: (id: string) => void;
   onVoteCheckpoint: (id: string, type: 'up' | 'down') => void;
+  isFullscreen?: boolean;
 }
 
 type MapThemeMode = 'dark-radar' | 'midnight-tactical' | 'osm-classic';
@@ -22,6 +23,7 @@ export default function LeafletMap({
   selectedCheckpointId,
   onSelectCheckpoint,
   onVoteCheckpoint,
+  isFullscreen,
 }: LeafletMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -40,6 +42,8 @@ export default function LeafletMap({
       center: [userLocation.lat, userLocation.lng],
       zoom: 13,
       zoomControl: false,
+      // @ts-ignore - Leaflet tap option
+      tap: false,
     });
 
     // Zoom control at bottom-right
@@ -52,6 +56,15 @@ export default function LeafletMap({
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Invalidate map size on fullscreen toggle
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 150);
+    }
+  }, [isFullscreen]);
 
   // Handle Dynamic Map Theme (Dark Radar, Midnight, or Longdo / OSM Classic)
   useEffect(() => {

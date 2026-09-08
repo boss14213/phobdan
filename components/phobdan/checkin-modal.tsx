@@ -70,8 +70,11 @@ export function CheckinModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 p-0 sm:p-4 backdrop-blur-md transition-opacity animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-slate-800 bg-[#0d111a] p-5 shadow-2xl transition-all sm:p-6 max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 p-0 sm:p-4 backdrop-blur-md transition-opacity animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg rounded-t-[28px] sm:rounded-3xl border border-slate-800 bg-[#0d111a] p-5 shadow-2xl transition-all sm:p-6 max-h-[88dvh] sm:max-h-[92vh] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
+        {/* Mobile Swipe / Sheet Grab Handle */}
+        <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />
+
         {/* Glowing Top Border */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 rounded-t-3xl" />
 
@@ -82,17 +85,17 @@ export function CheckinModal({
               🚨
             </span>
             <div>
-              <h3 className="text-lg font-black text-white">
+              <h3 className="text-base sm:text-lg font-black text-white">
                 พบด่านตรงนี้ (ปักหมุดด่วน)
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-[11px] sm:text-xs text-slate-400">
                 ใช้เวลาไม่เกิน 10 วินาที • ไม่ต้องล็อกอิน
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+            className="rounded-full p-2 text-slate-400 hover:bg-slate-800 hover:text-white min-h-[40px] min-w-[40px] flex items-center justify-center"
           >
             <X className="h-5 w-5" />
           </button>
@@ -174,7 +177,7 @@ export function CheckinModal({
                 value={locationName}
                 onChange={(e) => setLocationName(e.target.value)}
                 placeholder="เช่น ปากซอยสุขุมวิท 71, หน้าปั๊ม ปตท., ใต้สะพานลอย..."
-                className="w-full rounded-xl border border-slate-800 bg-slate-950 py-2.5 pl-9 pr-3 text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-xl border border-slate-800 bg-slate-950 py-2.5 pl-9 pr-3 text-sm sm:text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none min-h-[44px]"
               />
             </div>
           </div>
@@ -193,7 +196,7 @@ export function CheckinModal({
                     if (note.includes(chip)) return;
                     setNote(note ? `${note}, ${chip}` : chip);
                   }}
-                  className="rounded-full border border-slate-800 bg-slate-900/80 px-2.5 py-1 text-[11px] text-slate-400 transition-colors hover:border-blue-500/60 hover:text-blue-300"
+                  className="rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1.5 text-xs sm:text-[11px] text-slate-400 transition-colors hover:border-blue-500/60 hover:text-blue-300 min-h-[36px]"
                 >
                   + {chip}
                 </button>
@@ -204,7 +207,7 @@ export function CheckinModal({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="ระบุเพิ่มเติม เช่น ตรวจหมวกกันน็อค หรือช่องทาง..."
-              className="w-full rounded-xl border border-slate-800 bg-slate-950 py-2.5 px-3 text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-slate-800 bg-slate-950 py-2.5 px-3.5 text-sm sm:text-xs text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none min-h-[44px]"
             />
           </div>
 

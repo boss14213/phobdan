@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MapPin, ListFilter, Navigation, Award, Radio, Sparkles, Bot } from 'lucide-react';
+import { MapPin, ListFilter, Navigation, Award, Radio, Sparkles, Bot, AlertTriangle } from 'lucide-react';
 
 interface HeaderProps {
   viewMode: 'map' | 'list';
@@ -77,18 +77,14 @@ export function Header({
 
         {/* Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Emergency SOS Button */}
+          {/* Emergency Assistance Button (Secondary Support) */}
           <button
             onClick={onOpenSosModal}
-            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-red-500/60 bg-gradient-to-r from-red-950/80 to-rose-950/80 px-2 sm:px-3 py-1.5 text-[11px] sm:text-xs font-black text-red-200 shadow-lg shadow-red-950/60 backdrop-blur-xl transition-all hover:scale-105 hover:border-red-400 hover:text-white active:scale-95 animate-pulse min-h-[36px]"
-            title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-white/10 bg-white/[0.05] px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-300 hover:border-red-500/40 hover:text-red-300 active:scale-95 transition-all min-h-[36px]"
+            title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน (สำรอง)"
           >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-            </span>
-            <span className="text-red-300 font-black">SOS</span>
-            <span className="hidden sm:inline">ฉุกเฉิน</span>
+            <AlertTriangle className="h-3.5 w-3.5 text-red-400/80" />
+            <span className="hidden xs:inline">ช่วยเหลือ</span>
           </button>
 
           {/* AI Parser Button */}

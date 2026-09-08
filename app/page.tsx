@@ -46,6 +46,7 @@ export default function PhobDanPage() {
   const [userScore, setUserScore] = useState(65);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [scanRadiusKm, setScanRadiusKm] = useState<number>(3.5);
+  const [isMapFullscreen, setIsMapFullscreen] = useState(false);
 
   const watchIdRef = useRef<number | null>(null);
   const realtimeChannelRef = useRef<any>(null);
@@ -573,6 +574,8 @@ export default function PhobDanPage() {
                 selectedCheckpointId={selectedCheckpointId}
                 onSelectCheckpoint={setSelectedCheckpointId}
                 onVoteCheckpoint={handleVote}
+                isFullscreen={isMapFullscreen}
+                onToggleFullscreen={() => setIsMapFullscreen((prev) => !prev)}
               />
             </div>
 
@@ -642,56 +645,59 @@ export default function PhobDanPage() {
       </main>
 
       {/* Floating Bottom Mobile Navigation Dock (Mobile-First Thumb Experience) */}
-      <aside aria-label="Mobile Navigation Dock" className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom,0px))] left-3 right-3 z-40 sm:hidden">
-        <div className="flex items-center justify-between rounded-2xl border border-white/20 bg-[#090d16]/95 p-1.5 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.95)]">
-          <button
-            onClick={() => setIsCheckinOpen(true)}
-            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black text-white hover:bg-white/5 active:scale-95 transition-all min-h-[48px]"
-          >
-            <PlusCircle className="h-5 w-5 text-red-400" />
-            <span className="text-[10px] font-bold text-slate-300">ปักหมุด</span>
-          </button>
+      {!isMapFullscreen && (
+        <aside aria-label="Mobile Navigation Dock" className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom,0px))] left-3 right-3 z-40 sm:hidden">
+          <div className="flex items-center justify-between rounded-2xl border border-white/20 bg-[#090d16]/95 p-1.5 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.95)]">
+            {/* 1. Map / List View Toggle */}
+            <button
+              onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+              className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black transition-all min-h-[48px] active:scale-95 ${
+                viewMode === 'map' ? 'text-blue-400 bg-blue-500/10' : 'text-emerald-400 bg-emerald-500/10'
+              }`}
+            >
+              {viewMode === 'map' ? (
+                <>
+                  <ListFilter className="h-4.5 w-4.5 text-blue-400" />
+                  <span className="text-[10px] font-bold">ดูรายการ</span>
+                </>
+              ) : (
+                <>
+                  <MapPin className="h-4.5 w-4.5 text-emerald-400" />
+                  <span className="text-[10px] font-bold">ดูแผนที่</span>
+                </>
+              )}
+            </button>
 
-          <button
-            onClick={() => fetchCurrentGps(true)}
-            className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black text-white hover:bg-white/5 active:scale-95 transition-all min-h-[48px]"
-          >
-            <Radar className="h-5 w-5 text-blue-400" />
-            <span className="text-[10px] font-bold text-slate-300">สแกน</span>
-          </button>
+            {/* 2. Real-Time Radar Scan */}
+            <button
+              onClick={() => fetchCurrentGps(true)}
+              className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black text-white hover:bg-white/5 active:scale-95 transition-all min-h-[48px]"
+            >
+              <Radar className="h-4.5 w-4.5 text-blue-400" />
+              <span className="text-[10px] font-bold text-slate-300">สแกน</span>
+            </button>
 
-          {/* Elevated SOS Beacon */}
-          <button
-            onClick={() => setIsSosModalOpen(true)}
-            className="flex flex-col items-center justify-center -translate-y-3 rounded-2xl bg-gradient-to-tr from-red-600 via-rose-600 to-red-500 px-3 py-2 text-white shadow-[0_0_24px_rgba(239,68,68,0.7)] border-2 border-white/40 active:scale-95 transition-transform min-w-[62px] min-h-[56px]"
-          >
-            <span className="relative flex h-5 w-5 items-center justify-center">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
-              <AlertTriangle className="relative h-5 w-5 text-white" />
-            </span>
-            <span className="text-[10px] font-black text-white tracking-wider mt-0.5">SOS</span>
-          </button>
+            {/* 3. Core Check-in Action (Well-balanced highlight) */}
+            <button
+              onClick={() => setIsCheckinOpen(true)}
+              className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black text-amber-300 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 active:scale-95 transition-all min-h-[48px]"
+            >
+              <PlusCircle className="h-4.5 w-4.5 text-amber-400" />
+              <span className="text-[10px] font-black text-amber-300">ปักหมุด</span>
+            </button>
 
-          <button
-            onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
-            className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black transition-all min-h-[48px] active:scale-95 ${
-              viewMode === 'map' ? 'text-blue-400 bg-blue-500/10' : 'text-emerald-400 bg-emerald-500/10'
-            }`}
-          >
-            {viewMode === 'map' ? (
-              <>
-                <ListFilter className="h-5 w-5 text-blue-400" />
-                <span className="text-[10px] font-bold">ดูรายการ</span>
-              </>
-            ) : (
-              <>
-                <MapPin className="h-5 w-5 text-emerald-400" />
-                <span className="text-[10px] font-bold">ดูแผนที่</span>
-              </>
-            )}
-          </button>
-        </div>
-      </aside>
+            {/* 4. Roadside Emergency Assistance (Secondary Helper Tab, subtle & dignified) */}
+            <button
+              onClick={() => setIsSosModalOpen(true)}
+              className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-xs font-black text-slate-400 hover:text-red-300 hover:bg-red-500/10 active:scale-95 transition-all min-h-[48px]"
+              title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน (สำรอง)"
+            >
+              <AlertTriangle className="h-4.5 w-4.5 text-red-400/80" />
+              <span className="text-[10px] font-bold text-slate-400">ช่วยเหลือ</span>
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-white/[0.08] bg-[#05070a] py-6 text-center text-xs text-slate-400">

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PlusCircle, Sparkles, Navigation, Layers, Bot } from 'lucide-react';
+import { PlusCircle, Sparkles, Navigation, Layers, Bot, AlertTriangle } from 'lucide-react';
 import { CheckpointCategory } from '@/lib/types';
 
 interface HeroBannerProps {
@@ -72,14 +72,14 @@ export function HeroBanner({
               </button>
             )}
 
-            {/* Emergency SOS Button */}
+            {/* Emergency Assistance Button (Secondary Support) */}
             <button
               onClick={onOpenSosModal}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border border-red-500/50 bg-gradient-to-r from-red-950/90 to-rose-950/90 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-extrabold text-red-200 backdrop-blur-2xl shadow-xl transition-all hover:bg-red-900/70 hover:border-red-400 hover:text-white active:scale-95 animate-pulse min-h-[44px]"
-              title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน"
+              className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-[#090d16]/80 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-300 backdrop-blur-xl transition-all hover:bg-white/10 hover:text-white active:scale-95 min-h-[44px]"
+              title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน (สำรอง)"
             >
-              <span className="text-base">🚨</span>
-              <span>ขอช่วยเหลือ SOS</span>
+              <AlertTriangle className="h-4 w-4 text-red-400/80" />
+              <span>ขอช่วยเหลือ</span>
             </button>
 
             <button

@@ -33,19 +33,20 @@ export function HeroBanner({
       <div className="pointer-events-none absolute -right-20 -bottom-20 h-56 w-56 rounded-full bg-blue-600/25 blur-[100px] animate-siren-blue" />
 
       {/* Banner Artwork Container with Glossy Glass Overlays */}
-      <div className="relative w-full min-h-[270px] sm:min-h-[240px] md:h-72 overflow-hidden">
+      <div className="relative w-full overflow-hidden">
+        {/* Background Artwork Image (Positioned Absolute so it doesn't dictate height) */}
         <img
           src="/banner.jpg"
           alt="พบด่าน Night Patrol Radar Banner"
-          className="h-full w-full object-cover object-center opacity-80 transition-transform duration-1000 hover:scale-105"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-60 transition-transform duration-1000 hover:scale-105"
         />
         {/* Dynamic Dark Gradients & Wet Asphalt Vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07090e] via-[#07090e]/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07090e]/90 via-transparent to-[#07090e]/80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07090e] via-[#07090e]/60 to-[#07090e]/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07090e]/95 via-[#07090e]/75 to-[#07090e]/90" />
 
-        {/* Floating Content over Artwork */}
-        <div className="absolute inset-0 p-4 sm:p-6 flex flex-col justify-between z-10">
-          <div className="space-y-1.5 max-w-lg">
+        {/* Content Container (Relative so it expands naturally to fit all text and buttons!) */}
+        <div className="relative z-10 p-4 sm:p-6 flex flex-col justify-between space-y-4 min-h-[290px]">
+          <div className="space-y-2 max-w-xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] sm:text-[11px] font-extrabold text-blue-300 backdrop-blur-xl shadow-lg">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
               <span>ระบบเตือนจุดตรวจเรียลไทม์ • NIGHT PATROL RADAR</span>
@@ -53,17 +54,17 @@ export function HeroBanner({
             <h2 className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
               คนหนึ่งปัก อีกหลายคนปลอดภัย 🚨
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed drop-shadow-sm line-clamp-2 sm:line-clamp-none">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed drop-shadow-sm">
               ช่วยเพื่อนชะลอความเร็ว สวมหมวกกันน็อค และขับขี่ปลอดภัยในยามค่ำคืน
             </p>
           </div>
 
           {/* Action Buttons: Responsive Grid on Mobile, Flex on Desktop */}
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0 pt-2">
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0 pt-1">
             {onOpenAiModal && (
               <button
                 onClick={onOpenAiModal}
-                className="flex items-center justify-center gap-1.5 rounded-2xl border border-purple-500/40 bg-purple-950/60 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold text-purple-200 backdrop-blur-2xl shadow-xl transition-all hover:bg-purple-900/50 hover:border-purple-400 active:scale-95 min-h-[44px]"
+                className="flex items-center justify-center gap-1.5 rounded-2xl border border-purple-500/40 bg-purple-950/70 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-extrabold text-purple-200 backdrop-blur-2xl shadow-xl transition-all hover:bg-purple-900/60 hover:border-purple-400 active:scale-95 min-h-[44px]"
                 title="นำเข้าข้อความรายงานด่านจากโซเชียลด้วย AI"
               >
                 <Bot className="h-4 w-4 text-purple-400 animate-pulse" />
@@ -74,7 +75,7 @@ export function HeroBanner({
             {/* Emergency SOS Button */}
             <button
               onClick={onOpenSosModal}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border border-red-500/50 bg-gradient-to-r from-red-950/80 to-rose-950/80 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold text-red-200 backdrop-blur-2xl shadow-xl transition-all hover:bg-red-900/60 hover:border-red-400 hover:text-white active:scale-95 animate-pulse min-h-[44px]"
+              className="flex items-center justify-center gap-1.5 rounded-2xl border border-red-500/50 bg-gradient-to-r from-red-950/90 to-rose-950/90 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-extrabold text-red-200 backdrop-blur-2xl shadow-xl transition-all hover:bg-red-900/70 hover:border-red-400 hover:text-white active:scale-95 animate-pulse min-h-[44px]"
               title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน"
             >
               <span className="text-base">🚨</span>
@@ -83,7 +84,7 @@ export function HeroBanner({
 
             <button
               onClick={onOpenCheckin}
-              className="col-span-2 sm:col-span-1 group relative flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-blue-600 px-5 py-3 text-xs sm:text-sm font-extrabold text-white shadow-[0_0_25px_rgba(220,38,38,0.5)] transition-all hover:scale-105 hover:shadow-[0_0_35px_rgba(37,99,235,0.7)] active:scale-95 min-h-[44px]"
+              className="col-span-2 sm:col-span-1 group relative flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-blue-600 px-5 py-3 text-xs sm:text-sm font-extrabold text-white shadow-[0_0_25px_rgba(220,38,38,0.5)] transition-all hover:scale-105 hover:shadow-[0_0_35px_rgba(37,99,235,0.7)] active:scale-95 min-h-[46px]"
             >
               <PlusCircle className="h-4.5 w-4.5 transition-transform group-hover:rotate-90" />
               <span>ปักหมุดพบด่าน</span>

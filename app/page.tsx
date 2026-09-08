@@ -499,7 +499,7 @@ export default function PhobDanPage() {
       )}
 
       {/* Main Content Area */}
-      <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-3 sm:px-4 py-4 sm:py-6 space-y-5 pb-28 sm:pb-8">
+      <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-3 sm:px-4 py-4 sm:py-6 space-y-5 pb-36 sm:pb-12">
         {/* Active Emergency SOS Banners (Real-time Broadcast from vicinity) */}
         {activeSosAlerts.map((alert) => (
           <EmergencyAlertBanner

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">พบด่าน</string>
+    <string name="title_activity_main">พบด่าน</string>
+    <string name="package_name">com.phobdan.app</string>
+    <string name="custom_url_scheme">com.phobdan.app</string>
+</resources>

@@ -37,3 +37,13 @@ next-env.d.ts
 *.pptx
 *.py
 *.txt
+
+# android build artifacts
+android/.gradle
+android/build
+android/app/build
+android/.idea
+*.apk
+*.aab
+*.jks
+*.keystore

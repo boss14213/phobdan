@@ -10,22 +10,66 @@ interface AiParserModalProps {
   onAddCheckpoint: (cp: any) => void;
 }
 
-// Known Bangkok landmark reference points for smart AI geocoding
-const BANGKOK_LANDMARKS: { [key: string]: { lat: number; lng: number } } = {
+// Known Thailand nationwide landmark reference points for smart AI geocoding
+const THAILAND_LANDMARKS: { [key: string]: { lat: number; lng: number } } = {
+  // Bangkok & Vicinity
   'วิภาวดี': { lat: 13.7850, lng: 100.5580 },
   'พหลโยธิน': { lat: 13.8250, lng: 100.5700 },
   'รัชดา': { lat: 13.8150, lng: 100.5760 },
   'พระราม 9': { lat: 13.7500, lng: 100.5850 },
   'สุขุมวิท': { lat: 13.7380, lng: 100.5650 },
+  'ทองหล่อ': { lat: 13.7247, lng: 100.5794 },
+  'เอกมัย': { lat: 13.7314, lng: 100.5862 },
   'เกษตร-นวมินทร์': { lat: 13.8320, lng: 100.6120 },
+  'เลียบด่วน': { lat: 13.8033, lng: 100.6189 },
+  'รามอินทรา': { lat: 13.8450, lng: 100.6350 },
   'บรมราชชนนี': { lat: 13.7820, lng: 100.4720 },
   'สาทร': { lat: 13.7200, lng: 100.5230 },
   'ราชพฤกษ์': { lat: 13.8210, lng: 100.4500 },
   'พระราม 2': { lat: 13.6670, lng: 100.4370 },
   'ลาดพร้าว': { lat: 13.8050, lng: 100.5820 },
   'บางนา': { lat: 13.6680, lng: 100.6050 },
-  'ดินแดง': { lat: 13.7660, lng: 100.5520 },
-  'รามคำแหง': { lat: 13.7520, lng: 100.6150 },
+  'รังสิต': { lat: 13.9892, lng: 100.6178 },
+  'นนทบุรี': { lat: 13.8589, lng: 100.5208 },
+  'แคราย': { lat: 13.8589, lng: 100.5208 },
+
+  // Eastern
+  'พัทยา': { lat: 12.9268, lng: 100.8874 },
+  'บางแสน': { lat: 13.2842, lng: 100.9238 },
+  'ชลบุรี': { lat: 13.3245, lng: 100.9472 },
+  'ระยอง': { lat: 12.6842, lng: 101.2458 },
+
+  // Northern
+  'เชียงใหม่': { lat: 18.7905, lng: 98.9865 },
+  'นิมมาน': { lat: 18.8015, lng: 98.9668 },
+  'คันคลอง': { lat: 18.7905, lng: 98.9562 },
+  'ลำพูน': { lat: 18.4572, lng: 99.1382 },
+  'ลำปาง': { lat: 18.2745, lng: 99.4782 },
+  'เชียงราย': { lat: 19.8825, lng: 99.8322 },
+  'พิษณุโลก': { lat: 16.8245, lng: 100.3015 },
+
+  // Isan / Northeast
+  'โคราช': { lat: 14.9782, lng: 102.0725 },
+  'นครราชสีมา': { lat: 14.9782, lng: 102.0725 },
+  'ขอนแก่น': { lat: 16.4325, lng: 102.8252 },
+  'อุดร': { lat: 17.4085, lng: 102.7912 },
+  'อุบล': { lat: 15.2285, lng: 104.8582 },
+  'บุรีรัมย์': { lat: 14.9625, lng: 103.0945 },
+
+  // Southern
+  'ภูเก็ต': { lat: 7.8925, lng: 98.3685 },
+  'ป่าตอง': { lat: 7.9015, lng: 98.3125 },
+  'หาดใหญ่': { lat: 7.0085, lng: 100.4982 },
+  'สงขลา': { lat: 7.1850, lng: 100.5950 },
+  'สุราษฎร์': { lat: 9.1125, lng: 99.3082 },
+  'สมุย': { lat: 9.5312, lng: 100.0615 },
+  'ชุมพร': { lat: 10.6512, lng: 99.1582 },
+
+  // Western & Central
+  'หัวหิน': { lat: 12.5892, lng: 99.9542 },
+  'ชะอำ': { lat: 12.6512, lng: 99.9125 },
+  'อยุธยา': { lat: 14.3412, lng: 100.6125 },
+  'นครปฐม': { lat: 13.8115, lng: 100.0882 },
 };
 
 export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModalProps) {
@@ -70,7 +114,7 @@ export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModa
       let lat = 13.7563;
       let lng = 100.5018;
 
-      for (const [landmark, coords] of Object.entries(BANGKOK_LANDMARKS)) {
+      for (const [landmark, coords] of Object.entries(THAILAND_LANDMARKS)) {
         if (text.includes(landmark.toLowerCase())) {
           lat = coords.lat + (Math.random() - 0.5) * 0.006;
           lng = coords.lng + (Math.random() - 0.5) * 0.006;
@@ -86,7 +130,7 @@ export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModa
         direction,
         directionText,
         locationName,
-        note: `สกัดข้อมูลจากข้อความ: "${inputText}"`,
+        note: `สกัดข้อมูลจากโซเชียล: "${inputText}"`,
         lat,
         lng,
       });
@@ -94,6 +138,13 @@ export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModa
       setIsProcessing(false);
     }, 600);
   };
+
+  const samplePresets = [
+    '🎵 TikTok เชียงใหม่: "นิมมานหน้าเมญ่ามีด่านเป่าแอลกอฮอล์ รถติดยาวมาก ใครผ่านระวังด้วย"',
+    '🎵 TikTok พัทยา: "สุขุมวิทพัทยาใต้ขาออกไปจอมเทียน ตั้งด่านกวดขันวินัยจราจรและหมวกกันน็อก"',
+    '🎵 TikTok เลียบด่วน: "เลียบด่วนรามอินทราหน้า Central Eastville ตั้งด่านตรวจแอลกอฮอล์เลนด่วน"',
+    '🎵 TikTok ภูเก็ต: "สี่แยกบายพาสหน้าเซ็นทรัลภูเก็ต มีด่านเป่าตรวจเข้มมากทั้งสองฝั่ง"',
+  ];
 
   const handleConfirmAdd = () => {
     if (!parsedResult) return;
@@ -138,9 +189,31 @@ export function AiParserModal({ isOpen, onClose, onAddCheckpoint }: AiParserModa
         {/* Input Box */}
         <div className="mt-4 space-y-3">
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-              วางข้อความรายงานด่านจากโซเชียล:
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                วางข้อความรายงานด่านจากโซเชียล:
+              </label>
+              <span className="text-[10px] text-pink-400 font-bold flex items-center gap-1">
+                <span>🎵</span>
+                <span>รองรับ TikTok / LINE</span>
+              </span>
+            </div>
+
+            {/* Quick Presets */}
+            <div className="mb-2 flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] no-scrollbar">
+              <span className="text-slate-500 shrink-0 text-[10px]">ตัวอย่างฮิต:</span>
+              {samplePresets.map((preset, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setInputText(preset)}
+                  className="shrink-0 rounded-lg border border-pink-500/30 bg-pink-950/30 px-2 py-1 text-pink-300 hover:bg-pink-900/40 transition-colors"
+                >
+                  {preset.split(':')[0]}
+                </button>
+              ))}
+            </div>
+
             <textarea
               rows={3}
               value={inputText}

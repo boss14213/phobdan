@@ -181,12 +181,25 @@ export default function LeafletMap({
       const timeAgo = formatTimeAgo(cp.reportedTimestamp);
       const catConfig = CATEGORY_CONFIG[cp.category];
 
+      const isTikTok =
+        (cp.reportedBy && cp.reportedBy.toLowerCase().includes('tiktok')) ||
+        (cp.note && cp.note.toLowerCase().includes('tiktok'));
+
       const popupHtml = `
         <div style="font-family: inherit; width: 240px; padding: 2px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span style="background: #450a0a; color: #fca5a5; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; border: 1px solid #dc2626;">
-              ${catConfig.shortLabel}
-            </span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="background: #450a0a; color: #fca5a5; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; border: 1px solid #dc2626;">
+                ${catConfig.shortLabel}
+              </span>
+              ${
+                isTikTok
+                  ? `<span style="background: #831843; color: #fbcfe8; padding: 2px 6px; border-radius: 9999px; font-size: 10px; font-weight: 800; border: 1px solid #ec4899;">
+                      🎵 TikTok
+                    </span>`
+                  : ''
+              }
+            </div>
             <span style="font-size: 11px; color: #94a3b8;">${timeAgo}</span>
           </div>
           

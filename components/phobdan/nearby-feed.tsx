@@ -97,6 +97,15 @@ export function NearbyFeed({
                     ด่านสดใหม่
                   </span>
                 )}
+
+                {/* TikTok Trend Badge */}
+                {((cp.reportedBy && cp.reportedBy.toLowerCase().includes('tiktok')) ||
+                  (cp.note && cp.note.toLowerCase().includes('tiktok'))) && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-pink-500/40 bg-pink-950/60 px-2 py-0.5 text-[10px] font-extrabold text-pink-300 shadow-[0_0_8px_rgba(236,72,153,0.35)]">
+                    <span>🎵</span>
+                    <span>TikTok Trend</span>
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
@@ -128,7 +137,14 @@ export function NearbyFeed({
             {cp.note && (
               <div className="mt-2.5 flex items-start gap-1.5 rounded-xl border border-slate-800 bg-[#090b10] p-2 text-xs text-slate-300">
                 <MessageSquare className="h-3.5 w-3.5 text-blue-400 shrink-0 mt-0.5" />
-                <span>{cp.note}</span>
+                <div className="flex-1">
+                  <span>{cp.note}</span>
+                  {cp.reportedBy && (
+                    <span className="mt-1 block text-[10px] text-slate-400 font-medium">
+                      📡 แหล่งข่าว: <span className="text-slate-300 font-bold">{cp.reportedBy}</span>
+                    </span>
+                  )}
+                </div>
               </div>
             )}
 

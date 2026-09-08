@@ -9,7 +9,8 @@ import { NearbyFeed } from '@/components/phobdan/nearby-feed';
 import { CheckinModal } from '@/components/phobdan/checkin-modal';
 import { SafetyChecklist } from '@/components/phobdan/safety-checklist';
 import { LocationPermissionModal } from '@/components/phobdan/location-permission-modal';
-import { NightPatrolModal } from '@/components/phobdan/night-patrol-modal';
+import { EmergencySosModal } from '@/components/phobdan/emergency-sos-modal';
+import { EmergencyAlertBanner } from '@/components/phobdan/emergency-alert-banner';
 import { AiParserModal } from '@/components/phobdan/ai-parser-modal';
 import {
   INITIAL_CHECKPOINTS,
@@ -23,8 +24,8 @@ import {
   supabase,
   isSupabaseConfigured,
 } from '@/lib/supabase';
-import { Checkpoint, CheckpointCategory, UserLocation } from '@/lib/types';
-import { Sparkles, MapPin, ListFilter, PlusCircle, RefreshCw, Radar, Bot } from 'lucide-react';
+import { Checkpoint, CheckpointCategory, UserLocation, SosAlert, SosEmergencyType } from '@/lib/types';
+import { Sparkles, MapPin, ListFilter, PlusCircle, RefreshCw, Radar, Bot, AlertTriangle } from 'lucide-react';
 
 export default function PhobDanPage() {
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>(INITIAL_CHECKPOINTS);
@@ -35,7 +36,8 @@ export default function PhobDanPage() {
   const [selectedCategory, setSelectedCategory] = useState<CheckpointCategory | 'all'>('all');
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const [isCheckinOpen, setIsCheckinOpen] = useState(false);
-  const [is3DModalOpen, setIs3DModalOpen] = useState(false);
+  const [isSosModalOpen, setIsSosModalOpen] = useState(false);
+  const [activeSosAlerts, setActiveSosAlerts] = useState<SosAlert[]>([]);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isLiveDbConnected, setIsLiveDbConnected] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -46,6 +48,12 @@ export default function PhobDanPage() {
   const [scanRadiusKm, setScanRadiusKm] = useState<number>(3.5);
 
   const watchIdRef = useRef<number | null>(null);
+  const realtimeChannelRef = useRef<any>(null);
+  const userLocationRef = useRef<UserLocation>(userLocation);
+
+  useEffect(() => {
+    userLocationRef.current = userLocation;
+  }, [userLocation]);
 
   // Check initial permission on mount
   useEffect(() => {
@@ -132,10 +140,36 @@ export default function PhobDanPage() {
             }
           }
         )
+        .on(
+          'broadcast',
+          { event: 'sos_alert' },
+          (payload: any) => {
+            if (payload && payload.payload) {
+              const sos: SosAlert = payload.payload;
+              const dist = calculateDistanceKm(
+                userLocationRef.current.lat,
+                userLocationRef.current.lng,
+                sos.lat,
+                sos.lng
+              );
+              const enrichedSos: SosAlert = { ...sos, distanceKm: dist };
+              setActiveSosAlerts((prev) => [
+                enrichedSos,
+                ...prev.filter((a) => a.id !== sos.id),
+              ]);
+              showToast(
+                `🚨 [SOS ขอความช่วยเหลือ!] ${sos.emergencyLabel} ห่างจากคุณ ${dist.toFixed(1)} กม.`
+              );
+            }
+          }
+        )
         .subscribe();
+
+      realtimeChannelRef.current = channel;
 
       return () => {
         supabase?.removeChannel(channel);
+        realtimeChannelRef.current = null;
       };
     }
   }, []);
@@ -365,6 +399,71 @@ export default function PhobDanPage() {
     showToast('🤖 AI ถอดรหัสพิกัดและบันทึกด่านสำเร็จ! ขอบคุณที่ร่วมเตือนภัย');
   };
 
+  // Handle Community Emergency SOS Broadcast
+  const handleBroadcastSos = (sosData: {
+    emergencyType: SosEmergencyType;
+    emergencyLabel: string;
+    note: string;
+    contactPhone: string;
+    lat: number;
+    lng: number;
+  }) => {
+    const newSos: SosAlert = {
+      id: `sos-${Date.now()}`,
+      emergencyType: sosData.emergencyType,
+      emergencyLabel: sosData.emergencyLabel,
+      note: sosData.note,
+      contactPhone: sosData.contactPhone,
+      lat: sosData.lat,
+      lng: sosData.lng,
+      reportedTimestamp: Date.now(),
+      reportedBy: 'คุณ (ผู้ขอความช่วยเหลือ)',
+      status: 'active',
+      distanceKm: 0,
+    };
+
+    // Show active SOS banner at top
+    setActiveSosAlerts((prev) => [newSos, ...prev]);
+
+    // Broadcast across Supabase Realtime WebSocket to all online drivers
+    if (realtimeChannelRef.current) {
+      realtimeChannelRef.current.send({
+        type: 'broadcast',
+        event: 'sos_alert',
+        payload: newSos,
+      });
+    }
+
+    // Also pin as a prominent emergency checkpoint on the map and radar
+    const sosCheckpoint: Checkpoint = {
+      id: newSos.id,
+      title: `🚨 ขอความช่วยเหลือ: ${sosData.emergencyLabel}`,
+      locationName: `พิกัดฉุกเฉิน (${sosData.lat.toFixed(4)}, ${sosData.lng.toFixed(4)})`,
+      lat: sosData.lat,
+      lng: sosData.lng,
+      category: 'security',
+      direction: 'roadside',
+      directionText: 'ริมทาง / ฉุกเฉิน',
+      note: `${sosData.note || 'ต้องการความช่วยเหลือด่วน'} ${sosData.contactPhone ? `| โทรติดต่อ: ${sosData.contactPhone}` : ''}`,
+      reportedTimestamp: Date.now(),
+      reportedBy: 'ผู้ใช้ขอความช่วยเหลือฉุกเฉิน',
+      upvotes: 5,
+      downvotes: 0,
+      userVoted: 'up',
+      status: 'active',
+    };
+
+    setCheckpoints((prev) => [sosCheckpoint, ...prev]);
+    setSelectedCheckpointId(sosCheckpoint.id);
+    setViewMode('map');
+    showToast('🚨 ส่งสัญญาณ SOS ฉุกเฉินและแชร์พิกัดเส้นทางแล้ว!');
+
+    // Persist to Supabase if configured
+    if (isSupabaseConfigured) {
+      insertLiveCheckpoint(sosCheckpoint);
+    }
+  };
+
   const activeCount = checkpoints.filter((c) => c.status !== 'cleared').length;
   const totalConfirmed = checkpoints.reduce((acc, c) => acc + c.upvotes, 0);
 
@@ -387,7 +486,7 @@ export default function PhobDanPage() {
         isLiveTracking={isLiveTracking}
         onToggleLiveTracking={toggleLiveTracking}
         onOpenLocationModal={() => setShowLocationModal(true)}
-        onOpen3DMode={() => setIs3DModalOpen(true)}
+        onOpenSosModal={() => setIsSosModalOpen(true)}
         onOpenAiModal={() => setIsAiModalOpen(true)}
       />
 
@@ -401,10 +500,21 @@ export default function PhobDanPage() {
 
       {/* Main Content Area */}
       <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-4 py-4 sm:py-6 space-y-5 pb-24 sm:pb-8">
-        {/* Hero Banner with Artwork & 3D trigger */}
+        {/* Active Emergency SOS Banners (Real-time Broadcast from vicinity) */}
+        {activeSosAlerts.map((alert) => (
+          <EmergencyAlertBanner
+            key={alert.id}
+            alert={alert}
+            onDismiss={() =>
+              setActiveSosAlerts((prev) => prev.filter((a) => a.id !== alert.id))
+            }
+          />
+        ))}
+
+        {/* Hero Banner with Artwork & SOS trigger */}
         <HeroBanner
           onOpenCheckin={() => setIsCheckinOpen(true)}
-          onOpen3DMode={() => setIs3DModalOpen(true)}
+          onOpenSosModal={() => setIsSosModalOpen(true)}
           onOpenAiModal={() => setIsAiModalOpen(true)}
           activeCount={activeCount}
           totalConfirmedCount={totalConfirmed}
@@ -551,11 +661,14 @@ export default function PhobDanPage() {
           </button>
 
           <button
-            onClick={() => setIs3DModalOpen(true)}
-            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-purple-300 transition-all active:scale-90"
+            onClick={() => setIsSosModalOpen(true)}
+            className="flex flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-black text-rose-400 transition-all active:scale-90 relative"
           >
-            <Sparkles className="h-5 w-5 text-purple-400" />
-            <span className="text-[10px]">โหมด 3D</span>
+            <span className="relative flex h-5 w-5 items-center justify-center">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
+              <AlertTriangle className="relative h-5 w-5 text-rose-500" />
+            </span>
+            <span className="text-[10px] font-black text-rose-300">ขอช่วยเหลือ</span>
           </button>
 
           <button
@@ -610,10 +723,12 @@ export default function PhobDanPage() {
         onSubmitCheckin={handleNewCheckin}
       />
 
-      {/* 3D Infinite Night Patrol Gallery Modal */}
-      <NightPatrolModal
-        isOpen={is3DModalOpen}
-        onClose={() => setIs3DModalOpen(false)}
+      {/* Emergency Roadside Assistance / Community SOS Modal */}
+      <EmergencySosModal
+        isOpen={isSosModalOpen}
+        onClose={() => setIsSosModalOpen(false)}
+        userLocation={userLocation}
+        onBroadcastSos={handleBroadcastSos}
       />
 
       {/* AI Checkpoint Text Parser & Ingestion Modal */}

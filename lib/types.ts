@@ -45,3 +45,25 @@ export interface CategoryMeta {
   description: string;
   safetyAdvice: string;
 }
+
+export type SosEmergencyType =
+  | 'accident'   // อุบัติเหตุเฉี่ยวชน
+  | 'breakdown'  // รถเสีย / ยางแตก
+  | 'battery'    // แบตเตอรี่หมด
+  | 'fuel'       // น้ำมันหมดฉุกเฉิน
+  | 'medical';   // เจ็บป่วยฉุกเฉิน
+
+export interface SosAlert {
+  id: string;
+  emergencyType: SosEmergencyType;
+  emergencyLabel: string;
+  lat: number;
+  lng: number;
+  locationName?: string;
+  note?: string;
+  contactPhone?: string;
+  reportedTimestamp: number;
+  reportedBy?: string;
+  status: 'active' | 'resolved';
+  distanceKm?: number;
+}

@@ -14,7 +14,7 @@ interface HeaderProps {
   isLiveTracking: boolean;
   onToggleLiveTracking: () => void;
   onOpenLocationModal: () => void;
-  onOpen3DMode: () => void;
+  onOpenSosModal: () => void;
   onOpenAiModal?: () => void;
 }
 
@@ -29,7 +29,7 @@ export function Header({
   isLiveTracking,
   onToggleLiveTracking,
   onOpenLocationModal,
-  onOpen3DMode,
+  onOpenSosModal,
   onOpenAiModal,
 }: HeaderProps) {
   return (
@@ -75,8 +75,22 @@ export function Header({
           </div>
         </div>
 
-        {/* Right Section */}
+        {/* Action Controls */}
         <div className="flex items-center gap-2">
+          {/* Emergency SOS Button */}
+          <button
+            onClick={onOpenSosModal}
+            className="flex items-center gap-1.5 rounded-xl border border-red-500/60 bg-gradient-to-r from-red-950/80 to-rose-950/80 px-2.5 sm:px-3 py-1.5 text-xs font-black text-red-200 shadow-lg shadow-red-950/60 backdrop-blur-xl transition-all hover:scale-105 hover:border-red-400 hover:text-white active:scale-95 animate-pulse"
+            title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+            </span>
+            <span className="text-red-300 font-black">SOS</span>
+            <span className="hidden sm:inline">ฉุกเฉิน</span>
+          </button>
+
           {/* AI Parser Button */}
           {onOpenAiModal && (
             <button
@@ -88,16 +102,6 @@ export function Header({
               <span className="hidden sm:inline">AI กวาดพิกัด</span>
             </button>
           )}
-
-          {/* 3D Mode Button */}
-          <button
-            onClick={onOpen3DMode}
-            className="flex items-center gap-1.5 rounded-xl border border-white/15 bg-gradient-to-r from-blue-950/60 to-purple-950/60 px-3 py-1.5 text-xs font-extrabold text-blue-200 shadow-md shadow-blue-950/50 backdrop-blur-xl transition-all hover:scale-105 hover:border-blue-400 active:scale-95"
-            title="เปิดโหมดมุมมอง 3D ลาดตระเวน"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-blue-400 animate-pulse" />
-            <span className="hidden sm:inline">โหมด 3D</span>
-          </button>
 
           {/* GPS Status Button */}
           <button

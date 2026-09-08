@@ -6,7 +6,7 @@ import { CheckpointCategory } from '@/lib/types';
 
 interface HeroBannerProps {
   onOpenCheckin: () => void;
-  onOpen3DMode: () => void;
+  onOpenSosModal: () => void;
   onOpenAiModal?: () => void;
   activeCount: number;
   totalConfirmedCount: number;
@@ -16,7 +16,7 @@ interface HeroBannerProps {
 
 export function HeroBanner({
   onOpenCheckin,
-  onOpen3DMode,
+  onOpenSosModal,
   onOpenAiModal,
   activeCount,
   totalConfirmedCount,
@@ -71,12 +71,14 @@ export function HeroBanner({
               </button>
             )}
 
+            {/* Emergency SOS Button */}
             <button
-              onClick={onOpen3DMode}
-              className="flex items-center gap-2 rounded-2xl border border-white/20 bg-black/50 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold text-white backdrop-blur-2xl shadow-xl transition-all hover:bg-white/10 hover:border-white/40 active:scale-95"
+              onClick={onOpenSosModal}
+              className="flex items-center gap-1.5 rounded-2xl border border-red-500/50 bg-gradient-to-r from-red-950/70 to-rose-950/70 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold text-red-200 backdrop-blur-2xl shadow-xl transition-all hover:bg-red-900/60 hover:border-red-400 hover:text-white active:scale-95 animate-pulse"
+              title="ขอความช่วยเหลือฉุกเฉินบนท้องถนน"
             >
-              <Sparkles className="h-4 w-4 text-blue-400" />
-              <span>โหมด 3D</span>
+              <span className="text-base">🚨</span>
+              <span>ขอความช่วยเหลือ (SOS)</span>
             </button>
 
             <button
